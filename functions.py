@@ -50,19 +50,24 @@ def psi(X1,eps,t):
 
 def Xi(Z,eps,k,dk,ddk,t):
     sigma_t = np.sqrt(sigma_2(t))
+    score = -eps/sigma_t
     K = k(Z,Z)
     DK = dk(Z,Z)
 
-    K_eps2 = K * (eps @ eps.T)
+    K_eps2 = K * (score @ score.T)
 
-    DK_T = np.transpose(DK, (1, 0, 2))  
-    DK_T_eps = np.einsum('ijn,jn->ij', DK_T, -1*eps)  
+    # DK_T = np.transpose(DK, (1, 0, 2))  
+    # DK_T_eps = np.einsum('ijn,jn->ij', DK_T, score)  
+    # DK_eps_T = np.transpose(DK_T_eps, (1, 0))
 
-    DK_eps_T = np.transpose(DK_T_eps, (1, 0))
-
+    gradK_score = np.einsum('ijk, ijk -> ij',DK, (score[None,:,:] - score[:,None,:]))
     DDK = ddk(Z,Z)
 
-    return 1/sigma_t**2 * K_eps2 + 1/sigma_t * (DK_T_eps + DK_eps_T) + DDK
+    # print((DK_T_eps + DK_eps_T)[10,10:15])
+    # print(np.einsum('ijk, ijk -> ij',DK, (score[None,:,:] - score[:,None,:]))[10,10:15])
+    # print()
+
+    return  K_eps2 + gradK_score + DDK
 
 
 def Loss1(v,Z,mu,phi,Xi,t,k,dk,sigma,lambd):
