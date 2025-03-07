@@ -16,6 +16,9 @@ def mixt_gauss(Mu,Sigma,n,p):
     
     return samples
 
+
+###### GAUSSIAN KERNEL #####
+
 def k_gauss(x,y,sigma): #Gram matrix for gaussian kernel
     X_norm = np.sum(x**2, axis=1)
     Y_norm = np.sum(y**2, axis=1)
@@ -38,6 +41,20 @@ def ddk_gauss(x,y,sigma): #Gram matrix of nabla_2 . nabla_1 k(x,y), dim = (n,m)
     dist = X_norm[:,None] + Y_norm[None,:] - 2 * xy
     K = np.exp(-dist/(2*sigma**2))
     return 1/sigma**2 * K *(d - 1/sigma**2 * dist)
+
+#####LINEAR KERNEL #####
+
+def k_linear(x,y): #Gram matrix for linear kernel
+    return np.dot(x,y.T)    
+
+def dk_linear(x,y): #Gram matrix of nabla_1 k(x,y) , dim = (n,m,d)
+    return np.tile(y, (len(x), 1, 1))   
+
+def ddk_linear(x,y): #Gram matrix of nabla_2 . nabla_1 k(x,y), dim = (n,m)
+    return np.zeros((len(x),len(y)))
+
+
+#########################
 
 def sigma_2(t):
     return (1 - np.exp(-2*t)) + 1e-5
