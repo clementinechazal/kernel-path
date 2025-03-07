@@ -40,13 +40,13 @@ def ddk_gauss(x,y,sigma): #Gram matrix of nabla_2 . nabla_1 k(x,y), dim = (n,m)
     return 1/sigma**2 * K *(d - 1/sigma**2 * dist)
 
 def sigma_2(t):
-    return 1/2 *(1 - np.exp(-2*t)) + 1e-5
+    return (1 - np.exp(-2*t)) + 1e-5
 
 def psi(X1,eps,t):
     d = np.shape(X1[0])[0]
     sigma_t = np.sqrt(sigma_2(t)) 
     dot_product = np.einsum('ij,ij->i', X1, eps) 
-    return - np.exp(-2*t)/sigma_t**2 * np.linalg.norm(eps,axis=1)**2 - np.exp(-t)/sigma_t * dot_product - d * np.exp(-2*t)/sigma_t**2
+    return  np.exp(-2*t)/sigma_t**2 * np.linalg.norm(eps,axis=1)**2 + np.exp(-t)/sigma_t * dot_product - d * np.exp(-2*t)/sigma_t**2
 
 def Xi(Z,eps,k,dk,ddk,t):
     sigma_t = np.sqrt(sigma_2(t))
@@ -56,7 +56,7 @@ def Xi(Z,eps,k,dk,ddk,t):
     K_eps2 = K * (eps @ eps.T)
 
     DK_T = np.transpose(DK, (1, 0, 2))  
-    DK_T_eps = np.einsum('ijn,jn->ij', DK_T, eps)  
+    DK_T_eps = np.einsum('ijn,jn->ij', DK_T, -1*eps)  
 
     DK_eps_T = np.transpose(DK_T_eps, (1, 0))
 
@@ -92,7 +92,7 @@ def Loss2(v,Z,eps,mu,phi,Xi,psi,t,k,dk,sigma,lambd):
     sigma_t = np.sqrt(sigma_2(t))
     for i in range(n):
 
-        grad_log = eps[i]/sigma_t
+        grad_log = -eps[i]/sigma_t
         dk_Zi = dk(Z, np.array([Z[i]]))  # dk(Z, np.array(Z[i])) de dimension (n,1,d)
         diff = mu[None, :] * np.exp(-t) - Z  # de dimension (n,d)
         product = np.einsum('nid,nd->n', dk_Zi, diff)
