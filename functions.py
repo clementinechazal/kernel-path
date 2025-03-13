@@ -57,13 +57,13 @@ def ddk_linear(x,y): #Gram matrix of nabla_2 . nabla_1 k(x,y), dim = (n,m)
 #########################
 
 def sigma_2(t):
-    return (1 - np.exp(-2*t)) 
+    return (1 - np.exp(-2*t))
 
 def psi(X1,eps,t):
     d = np.shape(X1[0])[0]
     sigma_t = np.sqrt(sigma_2(t)) 
     dot_product = np.einsum('ij,ij->i', X1, eps) 
-    return  np.exp(-2*t)/sigma_t**2 * np.linalg.norm(eps,axis=1)**2 + np.exp(-t)/sigma_t * dot_product + d * np.exp(-2*t)/sigma_t**2
+    return  - np.exp(-2*t)/sigma_t**2 * np.linalg.norm(eps,axis=1)**2 + np.exp(-t)/sigma_t * dot_product + d * np.exp(-2*t)/sigma_t**2
 
 def Xi(Z,eps,k,dk,ddk,t):
     sigma_t = np.sqrt(sigma_2(t))
